@@ -1,46 +1,44 @@
 const express = require("express");
 const cors = require("cors");
+const dotenv = require("dotenv");
+
+dotenv.config();
+
 const app = express();
-PORT = 5000;
+const PORT = process.env.PORT || 5173;
+
 app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:5173" || "http://localhost:5174", 
-    credentials: true, 
+    origin: ["http://localhost:5173", "http://localhost:5174"], // multiple allowed
+    credentials: true,
   })
 );
 
-// database connection
+// Database connection
 const dbconnection = require("./Database/databaseconfig");
 
-// user routes middleware file
+// Routes
 const userRoutes = require("./routes/userroutes");
-
-// user routes middleware
 app.use("/api/user", userRoutes);
 
-// Question routes middleware file
 const questionRoutes = require("./routes/questionRoute");
-
-// Question routes middleware
 app.use("/api/question", questionRoutes);
 
-// answer routes middleware file
 const answerRoutes = require("./routes/answerRoute");
-
-// answer routes middleware
 app.use("/api/answer", answerRoutes);
 
+// Start server & test DB connection
 async function start() {
   try {
-    await dbconnection; 
-    console.log(" Connected to MySQL2 database!");
+    await dbconnection;
+    console.log("✅ Connected to Aiven MySQL database!");
 
-    app.listen(PORT);
-    console.log(`Server is running on port ${PORT}`);
+    app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
   } catch (error) {
-    console.error(" DB connection failed:", error.message);
+    console.error("❌ DB connection failed:", error.message);
   }
 }
+
 start();
